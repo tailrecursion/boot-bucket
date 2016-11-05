@@ -1,4 +1,4 @@
-# boot bucket
+# boot-bucket
 a boot task for spewing output files into an s3 bucket.
 
 [](dependency)
@@ -30,7 +30,7 @@ excerpt of a build.boot file using boot-bucket for deployment.
 (deftask build
   "Build the application with advanced optimizations."
   [o optimizations OPM kw "Optimizations to pass the cljs compiler."]
-  (let [o (or optimizations :simple)] ; default to advanced when fixed
+  (let [o (or optimizations :advanced)]
     (comp (speak) (hoplon) (cljs :optimizations o :compiler-options {:elide-asserts true}) (sift))))
 
 (deftask deploy
