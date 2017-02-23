@@ -37,5 +37,6 @@
         (doseq [{:keys [dir path]} src-files]
           (util/info "• %s\n" path)
           (pod/with-call-in pod
-            (tailrecursion.boot-bucket.client/put-file! ~*opts* ~(.getPath dir) ~path))))
+            (tailrecursion.boot-bucket.client/put-file! ~*opts* ~(.getPath dir) ~path)))
+        (with-meta fileset (into {} (mapv #(vector (:path %) ::uploaded) src-files))))
       fileset)))

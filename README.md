@@ -3,7 +3,7 @@ a boot task for spewing output files into an s3 bucket.
 
 [](dependency)
 ```clojure
-[tailrecursion/boot-bucket "0.1.0-SNAPSHOT"] ;; latest release
+[tailrecursion/boot-bucket "0.2.0-SNAPSHOT"] ;; latest release
 ```
 [](/dependency)
 
@@ -42,8 +42,8 @@ excerpt of a build.boot file using boot-bucket for deployment.
     (comp (build :optimizations optimizations) (spew :bucket b))))
 
 (task-options!
-  serve   {:port 3001}
-  sift    {:include #{#"index.html.out/" #"<app-ns>/"} :invert true}
-  spew    {:access-key (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
-           :secret-key (System/getenv "<AWS_SECRET_KEY_ENV_VAR>")})
+  serve {:port 3001}
+  sift  {:include #{#"index.html.out/" #"<app-ns>/"} :invert true}
+  spew  {:access-key (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
+         :secret-key (System/getenv "<AWS_SECRET_KEY_ENV_VAR>")})
 ```
