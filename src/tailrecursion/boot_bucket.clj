@@ -33,7 +33,7 @@
       (let [src-files*  (boot/output-files fileset)
             tgt-digests (pod/with-call-in pod
                           (tailrecursion.boot-bucket.client/list-digests ~*opts*))
-            src-files   (remove #(some (partial = (:hash %)) tgt-digests) src-files*)]
+            src-files   (remove #(some (fn [[p h]] (and (= (:path %) p) (= (:hash %) h))) tgt-digests) src-files*)]
         (doseq [{:keys [dir path]} src-files]
           (util/info "• %s\n" path)
           (pod/with-call-in pod

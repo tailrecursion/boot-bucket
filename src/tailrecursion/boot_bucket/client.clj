@@ -18,7 +18,7 @@
     (->> (.withBucketName (ListObjectsV2Request.) bucket)
          (.listObjectsV2 client)
          (.getObjectSummaries)
-         (mapv #(.getETag %)))))
+         (mapv #(vector (.getKey %) (.getETag %))))))
 
 (defn put-file! [{:keys [access-key secret-key bucket]} base-dir path]
   (let [client @(client access-key secret-key)]
