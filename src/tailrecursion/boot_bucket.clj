@@ -6,7 +6,7 @@
     [boot.util :as util]))
 
 (def ^:private deps
-  '[[com.amazonaws/aws-java-sdk-s3 "1.11.93"]])
+  '[[com.amazonaws/aws-java-sdk-s3 "1.11.95"]])
 
 (defn- warn-deps [deps]
   (let [conflict (delay (util/warn "Overriding project dependencies, using:\n"))]
