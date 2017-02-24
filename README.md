@@ -10,7 +10,7 @@ a boot task for spewing output files into an s3 bucket.
 ## overview
 this task uploads any files whose filenames or hashes differ from those in the
 targeted s3 bucket, then decorates them with metadata so they may be identified
-by subsequent tasks (see [boot-front](https://github.com/tailrecursion/boot-front).
+by subsequent tasks (see [boot-front](https://github.com/tailrecursion/boot-front)).
 
 ## usage
 excerpt of a build.boot file using boot-bucket with boot-front for deployment.
