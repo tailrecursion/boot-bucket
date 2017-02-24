@@ -6,7 +6,7 @@
     [boot.util :as util]))
 
 (def ^:private deps
-  '[[com.amazonaws/aws-java-sdk-s3 "1.11.40"]])
+  '[[com.amazonaws/aws-java-sdk-s3 "1.11.93"]])
 
 (defn- warn-deps [deps]
   (let [conflict (delay (util/warn "Overriding project dependencies, using:\n"))]
@@ -38,5 +38,4 @@
           (util/info "• %s\n" path)
           (pod/with-call-in pod
             (tailrecursion.boot-bucket.client/put-file! ~*opts* ~(.getPath dir) ~path)))
-        (with-meta fileset (into {} (mapv #(vector (:path %) ::uploaded) src-files))))
-      fileset)))
+          (boot/add-meta fileset (into {} (mapv #(vector (:path %) {::uploaded true}) src-files)))))))
