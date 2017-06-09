@@ -6,7 +6,8 @@
     [com.amazonaws.services.s3       AmazonS3]
     [com.amazonaws.services.s3       AmazonS3Client]
     [com.amazonaws.services.s3.model ListObjectsV2Request]
-    [com.amazonaws.services.s3.model PutObjectRequest]))
+    [com.amazonaws.services.s3.model PutObjectRequest]
+    [com.amazonaws.services.s3.model CannedAccessControlList]))
 
 (defn client [acc-key sec-key]
   (-> (BasicAWSCredentials. acc-key sec-key)
@@ -22,4 +23,5 @@
 
 (defn put-file! [{:keys [access-key secret-key bucket]} base-dir path]
   (let [client @(client access-key secret-key)]
-    (.putObject client (PutObjectRequest. bucket path (io/file base-dir path)))))
+    (.putObject client (doto (PutObjectRequest. bucket path (io/file base-dir path))
+                         (.setCannedAcl CannedAccessControlList/PublicRead)))))
