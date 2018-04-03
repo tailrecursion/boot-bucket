@@ -1,7 +1,9 @@
 (set-env!
   :resource-paths #{"src"}
-  :dependencies   '[[org.clojure/clojure "1.8.0"  :scope "provided"]
-                    [adzerk/bootlaces    "0.1.13" :scope "test"]])
+  :dependencies   '[[org.clojure/clojure "1.9.0"  :scope "provided"]
+                    [adzerk/bootlaces    "0.1.13" :scope "test"]
+                    [org.clojure/tools.namespace "0.2.3" :scope "test"]
+                    [com.amazonaws/aws-java-sdk-s3 "1.11.95" :scope "test"]])
 
 (require
   '[adzerk.bootlaces :refer :all])
@@ -22,4 +24,4 @@
        :description "Boot task for syncing fileset output to an AWS S3 bucket."
        :url         "https://github.com/tailrecursion/boot-bucket"
        :scm         {:url "https://github.com/tailrecursion/boot-bucket"}
-       :license     {"EPL" "http://www.eclipse.org/legal/epl-v10.html"} })
+       :license     {"EPL" "http://www.eclipse.org/legal/epl-v10.html"}})
