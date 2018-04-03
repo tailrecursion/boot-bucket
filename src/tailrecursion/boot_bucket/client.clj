@@ -24,4 +24,4 @@
 (defn put-file! [{:keys [access-key secret-key bucket]} base-dir path]
   (let [client @(client access-key secret-key)]
     (.putObject client (doto (PutObjectRequest. bucket path (io/file base-dir path))
-                         (.setCannedAcl CannedAccessControlList/PublicRead)))))
+                         (.withCannedAcl CannedAccessControlList/PublicRead)))))
