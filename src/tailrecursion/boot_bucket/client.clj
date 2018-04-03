@@ -52,7 +52,7 @@
     "content-length" (.setContentLength om v)
     "content-type" (.setContentType om v)
     (.addUserMetadata om k v))
-   (.withNewObjectMetadata por om)))
+   (.withMetadata por om)))
  por)
 
 (defn put-object!
