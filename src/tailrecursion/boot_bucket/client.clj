@@ -28,6 +28,7 @@
 
 (defn put-object-request
  [bucket base-dir path]
+ {:post [(put-object-request? %)]}
  (PutObjectRequest. bucket path (io/file base-dir path)))
 
 (defn with-public-read!
@@ -38,11 +39,10 @@
  por)
 
 (defn with-metadata!
- [por metadata]
- {:pre [(put-object-request? por)
-        (map? metadata)]
+ [por path-metadata]
+ {:pre [(put-object-request? por)]
   :post [(put-object-request? %)]}
- (doseq [[k v] metadata]
+ (doseq [[k v] path-metadata]
   (let [om (ObjectMetadata.)]
    (case (clojure.string/lower-case (name k))
     "cache-control" (.setCacheControl om v)
@@ -61,9 +61,9 @@
  (.putObject client por)
  por)
 
-(defn put-file! [{:keys [access-key secret-key bucket]} base-dir path]
+(defn put-file! [{:keys [access-key secret-key bucket metadata]} base-dir path]
  (let [client @(client access-key secret-key)]
   (-> (put-object-request bucket base-dir path)
    with-public-read!
-   (with-metadata! {"Content-Encoding" "gzip"})
+   (with-metadata! (get metadata path))
    (put-object! client))))
