@@ -8,7 +8,7 @@
 (require
   '[adzerk.bootlaces :refer :all])
 
-(def +version+ "0.3.1-SNAPSHOT")
+(def +version+ "0.3.1")
 
 (bootlaces! +version+)
 
@@ -16,7 +16,7 @@
   (comp (watch) (speak) (build-jar)))
 
 (deftask deploy []
-  (comp (speak) (build-jar) (push-snapshot)))
+  (comp (speak) (build-jar) (push-release)))
 
 (task-options!
  pom  {:project     'tailrecursion/boot-bucket
