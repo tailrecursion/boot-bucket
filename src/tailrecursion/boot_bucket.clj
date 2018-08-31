@@ -6,7 +6,7 @@
     [boot.util :as util]))
 
 (def ^:private deps
-  '[[com.amazonaws/aws-java-sdk-s3 "1.11.95"]])
+  '[[com.amazonaws/aws-java-sdk-s3 "1.11.399"]])
 
 (defn- warn-deps [deps]
   (let [conflict (delay (util/warn "Overriding project dependencies, using:\n"))]
@@ -23,11 +23,11 @@
         (update-in [:dependencies] into deps))))
 
 (boot/deftask spew
-  [b bucket     NAME       str "AWS Bucket Identifier"
-   a access-key ACCESS_KEY str "AWS Access Key"
-   s secret-key SECRET_KEY str "AWS Secret Key"
-   m metadata META edn "Path k/v pairs for metadata, e.g. {\"index.html\" {:content-encoding \"gzip\"}}"
-   p parallel? bool "Deploy files in parallel?"]
+  [b bucket     NAME       str  "AWS Bucket Identifier"
+   a access-key ACCESS_KEY str  "AWS Access Key"
+   s secret-key SECRET_KEY str  "AWS Secret Key"
+   m metadata   META       edn  "Path k/v pairs for metadata, e.g. {\"index.html\" {:content-encoding \"gzip\"}}"
+   p parallel?             bool "Deploy files in parallel?"]
  (let [pod (pod/make-pod (pod-env deps))
        out (boot/tmp-dir!)]
   (boot/with-pre-wrap fileset
@@ -35,13 +35,23 @@
    (let [src-files*  (boot/output-files fileset)
          tgt-digests (pod/with-call-in pod
                        (tailrecursion.boot-bucket.client/list-digests ~*opts*))
-         src-files   (remove #(some (fn [[p h]] (and (= (:path %) p) (= (:hash %) h))) tgt-digests) src-files*)]
-    (dorun
-     ((if parallel? pmap map)
-      (fn [{:keys [dir path]}]
-       (util/info "• %s\n" path)
-       (pod/with-call-in pod
-        (tailrecursion.boot-bucket.client/put-file! ~*opts* ~(.getPath dir) ~path))
-       (boot/add-meta fileset (into {} (mapv #(vector (:path %) {::uploaded true}) src-files))))
-      src-files))
-    fileset))))
+         src-files   (remove #(some (fn [[p h]] (prn :p p (:path %) :h h (:hash %)) (and (= (:path %) p) (= (:hash %) h))) tgt-digests) src-files*)]
+     (prn :src-files src-files)
+     (prn :metadata (mapv #(vector (:path %) {::uploaded true}) src-files))
+     (if (empty? src-files)
+       (util/info "■ no changed files to upload\n")
+      (doseq [{:keys [dir path]} src-files]
+        (util/info "• %s\n" path)
+        (pod/with-call-in pod
+          (tailrecursion.boot-bucket.client/put-file! ~*opts* ~(.getPath dir) ~path))
+        (boot/add-meta fileset (into {} (mapv #(vector (:path %) {::uploaded true}) src-files)))))
+     fileset))))
+
+#_(dorun
+   ((if parallel? pmap map)
+   (fn [{:keys [dir path]}]
+    (util/info "• %s\n" path)
+    (pod/with-call-in pod
+     (tailrecursion.boot-bucket.client/put-file! ~*opts* ~(.getPath dir) ~path))
+    (boot/add-meta fileset (into {} (mapv #(vector (:path %) {::uploaded true}) src-files))))
+   src-files))

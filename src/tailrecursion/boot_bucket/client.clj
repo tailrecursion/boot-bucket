@@ -1,6 +1,7 @@
 (ns tailrecursion.boot-bucket.client
   (:require
-    [clojure.java.io :as io])
+    [clojure.java.io :as io]
+    [clojure.string :refer [lower-case]])
   (:import
     [com.amazonaws.auth              BasicAWSCredentials]
     [com.amazonaws.services.s3       AmazonS3]
@@ -22,48 +23,22 @@
          (.getObjectSummaries)
          (mapv #(vector (.getKey %) (.getETag %))))))
 
-(defn put-object-request?
- [por]
- (instance? com.amazonaws.services.s3.model.PutObjectRequest por))
+(defn meta-set! [o k v]
+  (case (lower-case (name k))
+    "cache-control"       (.setCacheControl       o v)
+    "content-disposition" (.setContentDisposition o v)
+    "content-encoding"    (.setContentEncoding    o v)
+    "content-language"    (.setContentLanguage    o v)
+    "content-length"      (.setContentLength      o v)
+    "content-type"        (.setContentType        o v)
+                          (.addUserMetadata       o k v)) o)
 
-(defn put-object-request
- [bucket base-dir path]
- {:post [(put-object-request? %)]}
- (PutObjectRequest. bucket path (io/file base-dir path)))
-
-(defn with-public-read!
- [por]
- {:pre [(put-object-request? por)]
-  :post [(put-object-request? %)]}
- (.withCannedAcl por CannedAccessControlList/PublicRead)
- por)
-
-(defn with-metadata!
- [por path-metadata]
- {:pre [(put-object-request? por)]
-  :post [(put-object-request? %)]}
- (doseq [[k v] path-metadata]
-  (let [om (ObjectMetadata.)]
-   (case (clojure.string/lower-case (name k))
-    "cache-control" (.setCacheControl om v)
-    "content-disposition" (.setContentDisposition om v)
-    "content-encoding" (.setContentEncoding om v)
-    "content-language" (.setContentLanguage om v)
-    "content-length" (.setContentLength om v)
-    "content-type" (.setContentType om v)
-    (.addUserMetadata om k v))
-   (.withMetadata por om)))
- por)
-
-(defn put-object!
- [por client]
- {:pre [(put-object-request? por)]}
- (.putObject client por)
- por)
+(defn request [bucket base-dir path metadata]
+  (doto (PutObjectRequest. bucket path (io/file base-dir path))
+        (.withCannedAcl CannedAccessControlList/PublicRead)
+        (.withMetadata (reduce-kv meta-set! (ObjectMetadata.) (get metadata path)))))
 
 (defn put-file! [{:keys [access-key secret-key bucket metadata]} base-dir path]
- (let [client @(client access-key secret-key)]
-  (-> (put-object-request bucket base-dir path)
-   with-public-read!
-   (with-metadata! (get metadata path))
-   (put-object! client))))
+  (let [client @(client access-key secret-key)
+        req    (request bucket base-dir path metadata)]
+    (.putObject client req)))
