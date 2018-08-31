@@ -4,7 +4,7 @@ Boot task `spew` for spewing output files into an s3 bucket.
 
 [](dependency)
 ```clojure
-[tailrecursion/boot-bucket "0.3.2-SNAPSHOT"] ;; latest release
+[tailrecursion/boot-bucket "1.0.0"] ;; latest release
 ```
 [](/dependency)
 
