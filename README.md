@@ -4,7 +4,7 @@ a boot task for spewing files into an S3 bucket.
 
 [](dependency)
 ```clojure
-[tailrecursion/boot-bucket "1.1.0"] ;; latest release
+[tailrecursion/boot-bucket "2.0.0"] ;; latest release
 ```
 [](/dependency)
 
@@ -21,16 +21,16 @@ file basis to configure HTTP headers in S3 and cloundfront.
 
 in a departure from previous releases, as of `2.0.0`, boot-bucket defaults to
 the `:private` canned ACL, which should be changed to `:public-read` when
-serving files from an S3 bucket.  alternately, any of the following canned ACL
-keywords may be specified to the `access-control` parameter:
+serving files from an S3 bucket.  alternatively, any of the following canned ACL
+keywords may be specified to the `canned-acl` parameter:
 
 ```
 :private (default)
-:log-delivery-write        
-:bucket-owner-read         
-:bucket-owner-full-control 
-:authenticated-read        
-:public-read         
+:log-delivery-write
+:bucket-owner-read
+:bucket-owner-full-control
+:authenticated-read
+:public-read
 :public-read-write
 ```
 
@@ -92,9 +92,9 @@ with [boot-front][1] for deployments:
 (task-options!
   serve {:port 3001}
   sift  {:include #{#"index.html.out/" #"<app-ns>/"} :invert true}
-  spew  {:access-control :public-read
-	       :access-key     (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
-         :secret-key     (System/getenv "<AWS_SECRET_KEY_ENV_VAR>")}
+  spew  {:canned-acl :public-read
+         :access-key (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
+         :secret-key (System/getenv "<AWS_SECRET_KEY_ENV_VAR>")}
   burst {:access-key (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
          :secret-key (System/getenv "<AWS_SECRET_KEY_ENV_VAR>")})
 ```
@@ -107,10 +107,10 @@ an `index.html.js` artifact that was compressed upstream by another task like
 
 ```clojure
 (spew
- :access-key     "<aws-access-key>"
- :secret-key     "<aws-secret-key>"
- :access-control :public-read
- :metadata       {"index.html.js" {:content-encoding "gzip"}})
+ :canned-acl :public-read
+ :access-key "<aws-access-key>"
+ :secret-key "<aws-secret-key>"
+ :metadata   {"index.html.js" {:content-encoding "gzip"}})
 ```
 
 note that it's often important to zip CLJS output as core/goog can weigh in at

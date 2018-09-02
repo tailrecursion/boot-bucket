@@ -11,6 +11,15 @@
     [com.amazonaws.services.s3.model CannedAccessControlList]
     [com.amazonaws.services.s3.model ObjectMetadata]))
 
+(def canned-acls
+  {:private                   CannedAccessControlList/Private
+   :log-delivery-write        CannedAccessControlList/LogDeliveryWrite
+   :bucket-owner-read         CannedAccessControlList/BucketOwnerRead
+   :bucket-owner-full-control CannedAccessControlList/BucketOwnerFullControl
+   :authenticated-read        CannedAccessControlList/AuthenticatedRead
+   :public-read               CannedAccessControlList/PublicRead
+   :public-read-write         CannedAccessControlList/PublicReadWrite})
+
 (defn client [acc-key sec-key]
   (-> (BasicAWSCredentials. acc-key sec-key)
       (AmazonS3Client.)
@@ -33,13 +42,13 @@
     "content-type"        (.setContentType        o v)
                           (.addUserMetadata       o k v)) o)
 
-(defn request [bucket base-dir path metadata]
+(defn request [bucket base-dir path acl metadata]
   (doto (PutObjectRequest. bucket path (io/file base-dir path))
-        (.withCannedAcl CannedAccessControlList/PublicRead)
+        (.withCannedAcl (canned-acls acl CannedAccessControlList/Private))
         (.withMetadata (reduce-kv meta-set! (ObjectMetadata.) (get metadata path)))))
 
-(defn put-file! [{:keys [access-key secret-key bucket metadata]} base-dir path]
+(defn put-file! [{:keys [access-key secret-key bucket canned-acl metadata]} base-dir path]
   (let [client @(client access-key secret-key)
-        req    (request bucket base-dir path metadata)]
+        req    (request bucket base-dir path canned-acl metadata)]
     (.putObject client req)
     path))

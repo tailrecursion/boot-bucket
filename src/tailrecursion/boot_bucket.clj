@@ -23,10 +23,11 @@
         (update :dependencies into deps))))
 
 (boot/deftask spew
-  [b bucket     NAME       str  "AWS Bucket Identifier"
-   a access-key ACCESS_KEY str  "AWS Access Key"
-   s secret-key SECRET_KEY str  "AWS Secret Key"
-   m metadata   META       edn  "Map of the form {\"index.html\" {:content-encoding \"gzip\"}}"]
+  [b bucket NAME           str "AWS Bucket Identifier"
+   a access-key ACCESS_KEY str "AWS Access Key"
+   s secret-key SECRET_KEY str "AWS Secret Key"
+   c canned-acl ACL        kw  "A keyword indicating which predefined ACL should be used."
+   m metadata META         edn "Map of the form {\"index.html\" {:content-encoding \"gzip\"}}"]
  (let [pod (pod/make-pod (pod-env deps))
        out (boot/tmp-dir!)]
   (boot/with-pre-wrap fileset
