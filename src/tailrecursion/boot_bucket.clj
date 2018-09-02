@@ -34,12 +34,14 @@
     (let [src-files*  (boot/output-files fileset)
           tgt-digests (pod/with-call-in pod
                         (tailrecursion.boot-bucket.client/list-digests ~*opts*))
-          src-files   (remove #(some (fn [[p h]] (and (= (:path %) p) (= (:hash %) h))) tgt-digests) src-files*)]
-      (if (empty? src-files)
-        (util/info "■ no changed files to upload\n")
-        (do
-          (doseq [{:keys [dir path]} src-files]
-            (util/info "• %s\n" path)
-            (pod/with-call-in pod
-              (tailrecursion.boot-bucket.client/put-file! ~*opts* ~(.getPath dir) ~path)))
-          (boot/add-meta fileset (into {} (mapv #(vector (:path %) {::uploaded true}) src-files)))))))))
+          src-files   (remove #(some (fn [[p h]] (and (= (:path %) p) (= (:hash %) h))) tgt-digests) src-files*)
+          fut-paths   (atom [])]
+      (when (empty? src-files) (util/info "■ no changed files to upload\n"))
+      (doseq [{:keys [dir path]} src-files]
+        (->> (tailrecursion.boot-bucket.client/put-file! ~*opts* ~(.getPath dir) ~path)
+               (pod/with-call-in pod)
+               (future)
+               (swap! fut-paths conj)))
+      (doseq [fut-path @fut-paths]
+        (util/info "• %s\n" @fut-path))
+      (boot/add-meta fileset (into {} (mapv #(vector (:path %) {::uploaded true}) src-files)))))))

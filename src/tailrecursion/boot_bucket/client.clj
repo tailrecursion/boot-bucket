@@ -41,4 +41,5 @@
 (defn put-file! [{:keys [access-key secret-key bucket metadata]} base-dir path]
   (let [client @(client access-key secret-key)
         req    (request bucket base-dir path metadata)]
-    (.putObject client req)))
+    (.putObject client req)
+    path))
