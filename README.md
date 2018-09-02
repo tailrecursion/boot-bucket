@@ -14,8 +14,8 @@ the `spew` task uploads any files whose filenames or hashes differ from those in
 the targeted S3 bucket, then decorates them with boot metadata so they may be
 identified by subsequent tasks (see [boot-front](https://github.com/tailrecursion/boot-front)).
 
-the uploaded files may also themselves be adorned with AWS metadata on a per-
-file basis to configure HTTP headers in S3 and cloundfront.
+the files themselves may also be individually adorned with AWS metadata to
+configure HTTP headers in S3 and cloundfront.
 
 ## canned access control lists (ACLs)
 
@@ -113,19 +113,14 @@ an `index.html.js` artifact that was compressed upstream by another task like
  :metadata   {"index.html.js" {:content-encoding "gzip"}})
 ```
 
-note that it's often important to zip CLJS output as core/goog can weigh in at
-multiple MB and compression can drop this file size by 80%+. in fact, it's
-possible for compiled CLJS to weigh in at 10MB+ and compress to under 2MB - but
-at this point Cloudfront will no longer apply compression due to platform
-limitations. pre-gzipping files and setting the correct metadata headers in this
-way has several benefits:
+note that it's often good practice to zip the output from the CLJS compiler.
+boot-gzip may drop the file size as much as 80%, which results in a much better
+performance when serving a website from an S3 bucket and conserves space in S3.
+furtherwore, even when deploying the resulting javascript artifact behind
+cloudfront with the built-in compression enabled, if the file size exceeds
+10MB, it will be ignored.
 
-- achieve compressed files without cloudfront (e.g. serving site from S3)
-- avoid the 1MB min/10MB max limits for on-the-fly compression in cloudfront
-- reduce S3 resources needed in upload and storage
-- minor performance benefits as cloudfront does not need to apply compression
-
-note that cloudfront will not apply on-the-fly compression to any file with the
+also note that front will not apply on-the-fly compression to any file with the
 `Content-Encoding` header set, so be careful to only set it on files that have
 been gzipped during deployment.
 
