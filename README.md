@@ -39,7 +39,7 @@ custom acls are currently unsupported, but pull requests are most welcome.
 ## metadata
 both user and system metadata may be passed to the `metadata` parameter in the
 same map to modify the http headers served up by S3. these are supported on a
-per-file basis of the form `{"<filename>" {:<meta-key> "meta-value"}}`. an
+per-file basis of the form `{"<filename>" {:<meta-key> "<meta-value>"}}`. an
 example is shown below:
 
 ```
