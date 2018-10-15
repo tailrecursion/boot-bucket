@@ -4,7 +4,7 @@ a boot task for spewing files into an S3 bucket.
 
 [](dependency)
 ```clojure
-[tailrecursion/boot-bucket "2.0.0"] ;; latest release
+[tailrecursion/boot-bucket "2.1.0"] ;; latest release
 ```
 [](/dependency)
 
