@@ -93,9 +93,9 @@ with [boot-front][1] for deployments:
   serve {:port 3001}
   sift  {:include #{#"index.html.out/" #"<app-ns>/"} :invert true}
   spew  {:canned-acl :public-read
-	       :region     "us-east-1"
-         :access-key (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
-         :secret-key (System/getenv "<AWS_SECRET_KEY_ENV_VAR>")}
+        :region     "us-east-1"
+        :access-key (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
+        :secret-key (System/getenv "<AWS_SECRET_KEY_ENV_VAR>")}
   burst {:access-key (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
          :secret-key (System/getenv "<AWS_SECRET_KEY_ENV_VAR>")})
 ```
