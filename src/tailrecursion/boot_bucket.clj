@@ -6,7 +6,7 @@
     [boot.util :as util]))
 
 (def ^:private deps
-  '[[com.amazonaws/aws-java-sdk-s3 "1.11.419"]])
+  '[[com.amazonaws/aws-java-sdk-s3 "1.11.723"]])
 
 (defn- warn-deps [deps]
   (let [conflict (delay (util/warn "Overriding project dependencies, using:\n"))]
@@ -24,7 +24,7 @@
 
 (boot/deftask spew
   [b bucket NAME           str "AWS Bucket Identifier"
-   r region REGION         str "AWS Region to connect through (the bucket is global)"
+   r region REGION         str "AWS Region."
    a access-key ACCESS_KEY str "AWS Access Key"
    s secret-key SECRET_KEY str "AWS Secret Key"
    c canned-acl ACL        kw  "A keyword indicating which predefined ACL should be used"
@@ -33,7 +33,7 @@
        out  (boot/tmp-dir!)
        opts (assoc *opts* :region (or region "us-east-1"))]
   (boot/with-pre-wrap fileset
-    (util/info "Spewing files into the %s bucket through region %s...\n" bucket (opts :region))
+    (util/info "Spewing files into the %s bucket in region %s...\n" bucket (opts :region))
     (let [src-files*  (boot/output-files fileset)
           tgt-digests (pod/with-call-in pod
                         (tailrecursion.boot-bucket.client/list-digests ~opts))
@@ -41,10 +41,10 @@
           fut-paths   (atom [])]
       (when (empty? src-files) (util/info "■ no changed files to upload\n"))
       (doseq [{:keys [dir path]} src-files]
-        (->> (tailrecursion.boot-bucket.client/put-file! ~opts ~(.getPath dir) ~path)
+        (->> (tailrecursion.boot-bucket.client/put-file! ~opts ~(.getPath dir) ~path
                (pod/with-call-in pod)
                (future)
-               (swap! fut-paths conj)))
+               (swap! fut-paths conj))))
       (doseq [fut-path @fut-paths]
         (util/info "• %s\n" @fut-path))
       (boot/add-meta fileset (into {} (mapv #(vector (:path %) {::uploaded true}) src-files)))))))

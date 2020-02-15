@@ -4,7 +4,7 @@ a boot task for spewing files into an S3 bucket.
 
 [](dependency)
 ```clojure
-[tailrecursion/boot-bucket "2.1.0"] ;; latest release
+[tailrecursion/boot-bucket "2.1.1"] ;; latest release
 ```
 [](/dependency)
 
@@ -93,6 +93,7 @@ with [boot-front][1] for deployments:
   serve {:port 3001}
   sift  {:include #{#"index.html.out/" #"<app-ns>/"} :invert true}
   spew  {:canned-acl :public-read
+	       :region     "us-east-1"
          :access-key (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
          :secret-key (System/getenv "<AWS_SECRET_KEY_ENV_VAR>")}
   burst {:access-key (System/getenv "<AWS_ACCESS_KEY_ENV_VAR>")
@@ -108,6 +109,7 @@ an `index.html.js` artifact that was compressed upstream by another task like
 ```clojure
 (spew
  :canned-acl :public-read
+ :region     "us-east-1"
  :access-key "<aws-access-key>"
  :secret-key "<aws-secret-key>"
  :metadata   {"index.html.js" {:content-encoding "gzip"}})
