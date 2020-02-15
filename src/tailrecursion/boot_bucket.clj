@@ -41,10 +41,10 @@
           fut-paths   (atom [])]
       (when (empty? src-files) (util/info "■ no changed files to upload\n"))
       (doseq [{:keys [dir path]} src-files]
-        (->> (tailrecursion.boot-bucket.client/put-file! ~opts ~(.getPath dir) ~path
-               (pod/with-call-in pod)
-               (future)
-               (swap! fut-paths conj))))
+        (->> (tailrecursion.boot-bucket.client/put-file! ~opts ~(.getPath dir) ~path)
+             (pod/with-call-in pod)
+             (future)
+             (swap! fut-paths conj)))
       (doseq [fut-path @fut-paths]
         (util/info "• %s\n" @fut-path))
       (boot/add-meta fileset (into {} (mapv #(vector (:path %) {::uploaded true}) src-files)))))))
